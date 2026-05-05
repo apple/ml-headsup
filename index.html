@@ -1,0 +1,848 @@
+<!-- For licensing see accompanying LICENSE file. Copyright (C) 2026 Apple Inc. All Rights Reserved. -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <title>Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures</title>
+
+    <!-- SEO meta -->
+    <meta name="description" content="HeadsUp is a scalable feed-forward method for reconstructing high-quality 3D Gaussian heads from large-scale multi-camera setups. We train on 10,000+ subjects and achieve state-of-the-art reconstruction quality without test-time optimization.">
+    <meta name="keywords" content="HeadsUp, 3D Gaussian Splatting, head reconstruction, 3D head avatar, multi-view reconstruction, feed-forward reconstruction, computer vision, machine learning, deep learning, neural rendering, Apple, research paper, 3DGS, Gaussian heads, blendshape animation, identity generation">
+    <meta name="author" content="Evangelos Ntavelis, Sean Wu, Mohamad Shahbazi, Fabio Maninchedda, Dmitry Kostiaev, Artem Sevastopolsky, Vittorio Megaro, Trevor Phillips, Alejandro Blumentals, Shridhar Ravikumar, Mehak Gupta, Reinhard Knothe, Jeronimo Bayer, Matthias Vestner, Simon Schaefer, Thomas Etterlin, Christian Zimmermann, Mathias Deschler, Peter Kaufmann, Stefan Brugger, Sebastian Martin, Brian Amberg, Tom Runia">
+    <meta name="robots" content="index, follow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="HeadsUp: Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures">
+    <meta property="og:description" content="A scalable feed-forward method for reconstructing high-quality 3D Gaussian heads from large-scale multi-camera setups. Trained on 10,000+ subjects with state-of-the-art reconstruction quality.">
+    <meta property="og:site_name" content="Apple Machine Learning Research">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HeadsUp: Large-Scale High-Quality 3D Gaussian Head Reconstruction">
+    <meta name="twitter:description" content="A scalable feed-forward method for reconstructing high-quality 3D Gaussian heads from large-scale multi-camera setups by Apple.">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "ScholarlyArticle",
+        "headline": "HeadsUp: Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures",
+        "description": "A scalable feed-forward method for reconstructing high-quality 3D Gaussian heads from large-scale multi-camera setups.",
+        "author": [
+            {"@type": "Person", "name": "Evangelos Ntavelis", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Sean Wu"},
+            {"@type": "Person", "name": "Mohamad Shahbazi", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Fabio Maninchedda", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Dmitry Kostiaev", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Artem Sevastopolsky", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Vittorio Megaro", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Trevor Phillips", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Alejandro Blumentals", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Shridhar Ravikumar", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Mehak Gupta", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Reinhard Knothe", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Jeronimo Bayer", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Matthias Vestner", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Simon Schaefer", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Thomas Etterlin", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Christian Zimmermann", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Mathias Deschler", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Peter Kaufmann", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Stefan Brugger", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Sebastian Martin", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Brian Amberg", "affiliation": {"@type": "Organization", "name": "Apple"}},
+            {"@type": "Person", "name": "Tom Runia", "affiliation": {"@type": "Organization", "name": "Apple"}}
+        ],
+        "publisher": {
+            "@type": "Organization",
+            "name": "Apple"
+        },
+        "datePublished": "2026",
+        "about": ["3D Gaussian Splatting", "Head Reconstruction", "Computer Vision", "Machine Learning", "Neural Rendering", "Multi-View Reconstruction"],
+        "isPartOf": {
+            "@type": "CreativeWork",
+            "name": "Apple Machine Learning Research"
+        }
+    }
+    </script>
+
+    <!-- Breadcrumb Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Apple",
+                "item": "https://www.apple.com"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Machine Learning Research",
+                "item": "https://machinelearning.apple.com"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "HeadsUp"
+            }
+        ]
+    }
+    </script>
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="hero">
+    <div class="hero-mosaic">
+        <div class="hero-mosaic-track">
+            <img src="images/109.jpg" alt=""><img src="images/18303.jpg" alt=""><img src="images/1869.jpg" alt=""><img src="images/197.jpg" alt=""><img src="images/2573.jpg" alt=""><img src="images/2859.jpg" alt=""><img src="images/2969.jpg" alt=""><img src="images/3167.jpg" alt=""><img src="images/3783.jpg" alt=""><img src="images/42569.jpg" alt=""><img src="images/42613.jpg" alt=""><img src="images/42723.jpg" alt=""><img src="images/42767.jpg" alt="">
+            <img src="images/109.jpg" alt=""><img src="images/18303.jpg" alt=""><img src="images/1869.jpg" alt=""><img src="images/197.jpg" alt=""><img src="images/2573.jpg" alt=""><img src="images/2859.jpg" alt=""><img src="images/2969.jpg" alt=""><img src="images/3167.jpg" alt=""><img src="images/3783.jpg" alt=""><img src="images/42569.jpg" alt=""><img src="images/42613.jpg" alt=""><img src="images/42723.jpg" alt=""><img src="images/42767.jpg" alt="">
+        </div>
+        <div class="hero-mosaic-track reverse">
+            <img src="images/43801.jpg" alt=""><img src="images/43867.jpg" alt=""><img src="images/44175.jpg" alt=""><img src="images/4443.jpg" alt=""><img src="images/4685.jpg" alt=""><img src="images/507890.jpg" alt=""><img src="images/59575.jpg" alt=""><img src="images/5961.jpg" alt=""><img src="images/60081.jpg" alt=""><img src="images/60983.jpg" alt=""><img src="images/61115.jpg" alt=""><img src="images/61335.jpg" alt=""><img src="images/6137.jpg" alt="">
+            <img src="images/43801.jpg" alt=""><img src="images/43867.jpg" alt=""><img src="images/44175.jpg" alt=""><img src="images/4443.jpg" alt=""><img src="images/4685.jpg" alt=""><img src="images/507890.jpg" alt=""><img src="images/59575.jpg" alt=""><img src="images/5961.jpg" alt=""><img src="images/60081.jpg" alt=""><img src="images/60983.jpg" alt=""><img src="images/61115.jpg" alt=""><img src="images/61335.jpg" alt=""><img src="images/6137.jpg" alt="">
+        </div>
+        <div class="hero-mosaic-track">
+            <img src="images/6555.jpg" alt=""><img src="images/6621.jpg" alt=""><img src="images/6665.jpg" alt=""><img src="images/68529.jpg" alt=""><img src="images/6863.jpg" alt=""><img src="images/68815.jpg" alt=""><img src="images/68947.jpg" alt=""><img src="images/69959.jpg" alt=""><img src="images/70157.jpg" alt=""><img src="images/7259.jpg" alt=""><img src="images/7611.jpg" alt=""><img src="images/8183.jpg" alt=""><img src="images/87.jpg" alt="">
+            <img src="images/6555.jpg" alt=""><img src="images/6621.jpg" alt=""><img src="images/6665.jpg" alt=""><img src="images/68529.jpg" alt=""><img src="images/6863.jpg" alt=""><img src="images/68815.jpg" alt=""><img src="images/68947.jpg" alt=""><img src="images/69959.jpg" alt=""><img src="images/70157.jpg" alt=""><img src="images/7259.jpg" alt=""><img src="images/7611.jpg" alt=""><img src="images/8183.jpg" alt=""><img src="images/87.jpg" alt="">
+        </div>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <span class="badge">2026</span>
+        <h1 class="hero-full-title">Large-Scale High-Quality 3D Gaussian Head<br>Reconstruction from Multi-View Captures</h1>
+        <p class="hero-affiliation">Apple</p>
+        <div class="hero-authors">
+            <span>Evangelos Ntavelis</span>
+            <span>Sean Wu<sup class="author-note">*</sup></span>
+            <span>Mohamad Shahbazi</span>
+            <span>Fabio Maninchedda</span>
+            <span>Dmitry Kostiaev</span>
+            <span>Artem Sevastopolsky</span>
+            <span>Vittorio Megaro</span>
+            <span>Trevor Phillips</span>
+            <span>Alejandro Blumentals</span>
+            <span>Shridhar Ravikumar</span>
+            <span>Mehak Gupta</span>
+            <span>Reinhard Knothe</span>
+            <span>Jeronimo Bayer</span>
+            <span>Matthias Vestner</span>
+            <span>Simon Schaefer</span>
+            <span>Thomas Etterlin</span>
+            <span>Christian Zimmermann</span>
+            <span>Mathias Deschler</span>
+            <span>Peter Kaufmann</span>
+            <span>Stefan Brugger</span>
+            <span>Sebastian Martin</span>
+            <span>Brian Amberg</span>
+            <span>Tom Runia</span>
+        </div>
+        <p class="author-footnote"><sup>*</sup>Work done during internship at Apple</p>
+        <div class="hero-buttons">
+            <a href="#" class="hero-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                Paper
+            </a>
+        </div>
+    </div>
+</header>
+
+<nav id="main-nav">
+    <ul>
+        <li><a href="#abstract">Abstract</a></li>
+        <li><a href="#internal10k">Internal Dataset Novel Identity</a></li>
+        <li><a href="#ava256-subjects">Ava-256 Novel Identity</a></li>
+        <li><a href="#generation">Text-driven Identity Generation</a></li>
+        <li><a href="#rigging">Blendshape-driven Latent Animation</a></li>
+        <li><a href="#gui">Blendshape UI Visualization</a></li>
+        <li><a href="#citation">Citation</a></li>
+    </ul>
+</nav>
+
+<!-- §1 ABSTRACT -->
+<section id="abstract" class="fade-in">
+    <div class="section-header">
+        <span class="section-number">01</span>
+        <div>
+            <h2>Abstract</h2>
+        </div>
+    </div>
+    <p class="abstract-text">We propose <strong>HeadsUp</strong>, a scalable feed-forward method for reconstructing high-quality 3D Gaussian heads from large-scale multi-camera setups. Our method employs an efficient encoder-decoder architecture that compresses input views into a compact latent representation. This latent representation is then decoded into a set of UV-parameterized 3D Gaussians anchored to a neutral head template. This UV representation decouples the number of 3D Gaussians from the number and resolution of input images, enabling training with many high-resolution input views. We train and evaluate our model on an internal dataset with more than 10,000 subjects, which is an order of magnitude larger than existing multi-view human head datasets. HeadsUp achieves state-of-the-art reconstruction quality and generalizes to novel identities without test-time optimization. We extensively analyze the scaling behavior of our model across identities, views, and model capacity, revealing practical insights for quality-compute trade-offs. Finally, we highlight the strength of our latent space by showcasing two downstream applications: generating novel 3D identities and animating the 3D heads with expression blendshapes.</p>
+</section>
+
+<!-- §2 INTERNAL DATASET -->
+<section id="internal10k" class="fade-in">
+    <div class="section-header">
+        <span class="section-number">02</span>
+        <div>
+            <h2>Novel Identity Reconstruction Results (Internal10k)</h2>
+            <p class="section-desc">Per-subject reconstruction results on our internal multi-camera capture dataset with 10,000 subjects under controlled diffuse lighting. Select a view type and validation subject below.</p>
+        </div>
+    </div>
+
+    <div class="ava-browser" id="internal10k-browser">
+        <!-- View type selector -->
+        <div class="ava-method-bar">
+            <button class="ava-method-btn headsup active" data-method="headsup_10enc_closeup">HeadsUp 10-view</button>
+            <div class="method-separator"></div>
+            <button class="ava-method-btn avat3r" data-method="avat3r_6enc_closeup">Avat3r 6-view</button>
+            <button class="ava-method-btn avat3r" data-method="avat3r_4enc_closeup">Avat3r 4-view</button>
+        </div>
+
+        <!-- Video display -->
+        <div class="ava-video-stage">
+            <video id="internal10k-video" controls muted loop playsinline preload="metadata">
+                <source src="videos/internal_dataset_results/headsup_10enc_closeup/757689.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- Subject selector -->
+        <div class="ava-subject-bar" id="internal10k-subjects">
+            <div class="ava-subject active" data-subject="757689"><canvas></canvas><span>Subject 1</span></div>
+            <div class="ava-subject" data-subject="773377"><canvas></canvas><span>Subject 2</span></div>
+            <div class="ava-subject" data-subject="757700"><canvas></canvas><span>Subject 3</span></div>
+            <div class="ava-subject" data-subject="757719"><canvas></canvas><span>Subject 4</span></div>
+            <div class="ava-subject" data-subject="1127583"><canvas></canvas><span>Subject 5</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- §3 AVA-256 SUBJECTS -->
+<section id="ava256-subjects" class="fade-in">
+    <div class="section-header">
+        <span class="section-number">03</span>
+        <div>
+            <h2>Novel Identity Reconstruction Results (Ava-256)</h2>
+            <p class="section-desc">Per-subject reconstruction results on Ava-256, showing renderings from novel viewpoints for different expressions. Select a method and validation subject below.</p>
+        </div>
+    </div>
+
+    <div class="ava-browser" id="ava-browser">
+        <!-- Method selector -->
+        <div class="ava-method-bar">
+            <button class="ava-method-btn headsup active" data-method="headsup_16enc">HeadsUp 16-view</button>
+            <button class="ava-method-btn headsup" data-method="headsup_6enc">HeadsUp 6-view</button>
+            <button class="ava-method-btn headsup" data-method="headsup_4enc">HeadsUp 4-view</button>
+            <div class="method-separator"></div>
+            <button class="ava-method-btn avat3r" data-method="avat3r_6enc">Avat3r 6-view</button>
+            <button class="ava-method-btn avat3r" data-method="avat3r_4enc">Avat3r 4-view</button>
+        </div>
+
+        <!-- Video display -->
+        <div class="ava-video-stage">
+            <video id="ava-video" controls muted loop playsinline preload="metadata">
+                <source src="videos/ava256_subjects/headsup_16enc/PGO261.mp4" type="video/mp4">
+            </video>
+        </div>
+
+        <!-- Subject selector -->
+        <div class="ava-subject-bar" id="ava-subjects">
+            <div class="ava-subject active" data-subject="PGO261"><canvas></canvas><span>PGO261</span></div>
+            <div class="ava-subject" data-subject="UHV563"><canvas></canvas><span>UHV563</span></div>
+            <div class="ava-subject" data-subject="BGR645"><canvas></canvas><span>BGR645</span></div>
+            <div class="ava-subject" data-subject="IBQ026"><canvas></canvas><span>IBQ026</span></div>
+            <div class="ava-subject" data-subject="LCJ763"><canvas></canvas><span>LCJ763</span></div>
+            <div class="ava-subject" data-subject="PDG961"><canvas></canvas><span>PDG961</span></div>
+            <div class="ava-subject" data-subject="APP152"><canvas></canvas><span>APP152</span></div>
+            <div class="ava-subject" data-subject="PSV686"><canvas></canvas><span>PSV686</span></div>
+            <div class="ava-subject" data-subject="TCE049"><canvas></canvas><span>TCE049</span></div>
+            <div class="ava-subject" data-subject="YJF815"><canvas></canvas><span>YJF815</span></div>
+            <div class="ava-subject" data-subject="INQ807"><canvas></canvas><span>INQ807</span></div>
+            <div class="ava-subject" data-subject="KWL586"><canvas></canvas><span>KWL586</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- §4 GENERATION RESULTS -->
+<section id="generation" class="fade-in">
+    <div class="section-header">
+        <span class="section-number">04</span>
+        <div>
+            <h2>Text-driven Identity Generation</h2>
+            <p class="section-desc">Text-conditioned generation of novel 3D Gaussian head identities.</p>
+        </div>
+    </div>
+    <div class="generation-video-container">
+        <video controls muted loop playsinline preload="metadata">
+            <source src="videos/text_conditioned_genid.mp4" type="video/mp4">
+        </video>
+    </div>
+</section>
+
+<!-- §5 BLENDSHAPE RIGGING -->
+<section id="rigging" class="fade-in">
+    <div class="section-header">
+        <span class="section-number">05</span>
+        <div>
+            <h2>Blendshape-driven Latent Animation</h2>
+            <p class="section-desc">Our reconstructed Gaussian heads are riggable via blendshape parameters. We extract blendshapes of the input images to drive and animate our latent. Select a subject on the right to change all reconstructions.</p>
+        </div>
+    </div>
+
+    <div class="rigging-layout">
+        <div class="rigging-grid">
+            <!-- Column 1: Neutral -->
+            <div class="rigging-col">
+                <div class="rigging-col-header">&nbsp;</div>
+                <div class="rigging-video-row">
+                    <div class="rigging-row-label">&nbsp;</div>
+                    <div class="rigging-gt-video rigging-gt-placeholder"></div>
+                </div>
+                <div class="rigging-video-row">
+                    <div class="rigging-row-label">Source Identity</div>
+                    <div class="rigging-video-slot" data-expression="neutral">
+                        <video class="rigging-ours-video" data-subject="519611" muted loop playsinline preload="metadata"><source src="videos/rigging/neutral/519611.mp4" type="video/mp4"></video>
+                        <video class="rigging-ours-video" data-subject="507890" muted loop playsinline preload="metadata"><source src="videos/rigging/neutral/507890.mp4" type="video/mp4"></video>
+
+                        <video class="rigging-ours-video" data-subject="520781" muted loop playsinline preload="metadata"><source src="videos/rigging/neutral/520781.mp4" type="video/mp4"></video>
+                        <video class="rigging-ours-video" data-subject="594986" muted loop playsinline preload="metadata"><source src="videos/rigging/neutral/594986.mp4" type="video/mp4"></video>
+                        <video class="rigging-ours-video active" data-subject="614907" muted loop playsinline preload="metadata"><source src="videos/rigging/neutral/614907.mp4" type="video/mp4"></video>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 2: Smile -->
+            <div class="rigging-col">
+                <div class="rigging-col-header">Smile</div>
+                <div class="rigging-video-row">
+                    <div class="rigging-row-label">Driving Expression</div>
+                    <video class="rigging-gt-video" muted loop playsinline preload="metadata"><source src="videos/rigging/smile_closed_mouth_gt/519611.mp4" type="video/mp4"></video>
+                </div>
+                <div class="rigging-video-row">
+                    <div class="rigging-row-label">Rendered Expression</div>
+                    <div class="rigging-video-slot" data-expression="smile">
+                        <video class="rigging-ours-video" data-subject="519611" muted loop playsinline preload="metadata"><source src="videos/rigging/smile_closed_mouth/519611.mp4" type="video/mp4"></video>
+                        <video class="rigging-ours-video" data-subject="507890" muted loop playsinline preload="metadata"><source src="videos/rigging/smile_closed_mouth/507890.mp4" type="video/mp4"></video>
+
+                        <video class="rigging-ours-video" data-subject="520781" muted loop playsinline preload="metadata"><source src="videos/rigging/smile_closed_mouth/520781.mp4" type="video/mp4"></video>
+                        <video class="rigging-ours-video" data-subject="594986" muted loop playsinline preload="metadata"><source src="videos/rigging/smile_closed_mouth/594986.mp4" type="video/mp4"></video>
+                        <video class="rigging-ours-video active" data-subject="614907" muted loop playsinline preload="metadata"><source src="videos/rigging/smile_closed_mouth/614907.mp4" type="video/mp4"></video>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Column 3: Raise Brows -->
+            <div class="rigging-col">
+                <div class="rigging-col-header">Raise Brows</div>
+                <div class="rigging-video-row">
+                    <div class="rigging-row-label">Driving Expression</div>
+                    <video class="rigging-gt-video" muted loop playsinline preload="metadata"><source src="videos/rigging/rise_brows_gt/519611.mp4" type="video/mp4"></video>
+                </div>
+                <div class="rigging-video-row">
+                    <div class="rigging-row-label">Rendered Expression</div>
+                    <div class="rigging-video-slot" data-expression="brows">
+                        <video class="rigging-ours-video" data-subject="519611" muted loop playsinline preload="metadata"><source src="videos/rigging/rise_brows/519611.mp4" type="video/mp4"></video>
+                        <video class="rigging-ours-video" data-subject="507890" muted loop playsinline preload="metadata"><source src="videos/rigging/rise_brows/507890.mp4" type="video/mp4"></video>
+
+                        <video class="rigging-ours-video" data-subject="520781" muted loop playsinline preload="metadata"><source src="videos/rigging/rise_brows/520781.mp4" type="video/mp4"></video>
+                        <video class="rigging-ours-video" data-subject="594986" muted loop playsinline preload="metadata"><source src="videos/rigging/rise_brows/594986.mp4" type="video/mp4"></video>
+                        <video class="rigging-ours-video active" data-subject="614907" muted loop playsinline preload="metadata"><source src="videos/rigging/rise_brows/614907.mp4" type="video/mp4"></video>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shared subject selector -->
+        <div class="rigging-selector">
+            <div class="rigging-col-header">Subject</div>
+            <div class="rigging-subject-list" id="rigging-subjects">
+                <div class="rigging-subject active" data-subject="614907"><canvas></canvas></div>
+                <div class="rigging-subject" data-subject="507890"><canvas></canvas></div>
+                <div class="rigging-subject" data-subject="520781"><canvas></canvas></div>
+                <div class="rigging-subject" data-subject="594986"><canvas></canvas></div>
+                <div class="rigging-subject" data-subject="519611"><canvas></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ava-browser driving-browser" id="driving-browser">
+        <div class="ava-video-stage driving-video-stage">
+            <video id="driving-video" controls muted loop playsinline preload="metadata">
+                <source src="videos/blendshape_driven_collage_videos/collage_driving_519611_row.mp4" type="video/mp4">
+            </video>
+        </div>
+        <div class="ava-subject-bar" id="driving-subjects">
+            <div class="ava-subject active" data-subject="519611"><canvas></canvas><span>Subject 1</span></div>
+            <div class="ava-subject" data-subject="507890"><canvas></canvas><span>Subject 2</span></div>
+            <div class="ava-subject" data-subject="594986"><canvas></canvas><span>Subject 3</span></div>
+            <div class="ava-subject" data-subject="614907"><canvas></canvas><span>Subject 4</span></div>
+        </div>
+    </div>
+</section>
+
+<!-- §6 GUI -->
+<section id="gui" class="fade-in">
+    <div class="section-header">
+        <span class="section-number">06</span>
+        <div>
+            <h2>Blendshape UI Visualization</h2>
+            <p class="section-desc">Manipulation of reconstructed 3D Gaussian heads with direct blendshape and camera control.</p>
+        </div>
+    </div>
+    <div class="carousel" data-carousel tabindex="0">
+        <div class="carousel-stage">
+            <button class="carousel-arrow prev" data-prev>&#8249;</button>
+            <button class="carousel-arrow next" data-next>&#8250;</button>
+            <div class="carousel-slide active"><video controls muted playsinline preload="metadata"><source src="videos/rigging_gui_smaller.mp4" type="video/mp4"></video></div>
+        </div>
+        <div class="carousel-caption"><span class="label-text"></span><span class="counter"></span></div>
+        <div class="carousel-thumbs"></div>
+    </div>
+</section>
+
+<!-- §7 Citation -->
+<section id="citation" class="fade-in">
+    <div class="section-header">
+        <span class="section-number">07</span>
+        <div>
+            <h2>Citation</h2>
+            <p class="section-desc">If you find this work useful, please cite our paper.</p>
+        </div>
+    </div>
+    <div class="citation-block">
+        <button class="citation-copy-btn" id="copy-bibtex" aria-label="Copy BibTeX">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+            Copy
+        </button>
+        <pre><code id="bibtex-code">@article{ntavelis2026headsup,
+  title     = {Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures},
+  author    = {Ntavelis, Evan and Wu, Sean and Shahbazi, Mohamad and Maninchedda, Fabio and Kostiaev, Dmitry and Sevastopolsky, Artem and Megaro, Vittorio and Phillips, Trevor and Blumentals, Alejandro and Ravikumar, Shridhar and Gupta, Mehak and Knothe, Reinhard and Bayer, Jeronimo and Vestner, Matthias and Schaefer, Simon and Etterlin, Thomas and Zimmermann, Christian and Deschler, Mathias and Kaufmann, Peter and Brugger, Stefan and Martin, Sebastian and Amberg, Brian and Runia, Tom},
+  year      = {2026},
+}</code></pre>
+    </div>
+</section>
+
+<footer>
+    <div class="footer-content">
+        <p class="footer-title">HeadsUp</p>
+        <p>Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures</p>
+        <div class="footer-separator"></div>
+        <p class="footer-venue">&copy; 2026 Apple. All rights reserved.</p>
+    </div>
+</footer>
+
+<!-- Scroll to top -->
+<button class="scroll-top" id="scroll-top" aria-label="Scroll to top">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 10 7 15 12"/></svg>
+</button>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    /* ── Fade-in on scroll ─────────────────────────────────────────── */
+    const fadeObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                fadeObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.08 });
+    document.querySelectorAll('.fade-in').forEach(el => fadeObserver.observe(el));
+
+    /* ── Active nav link tracking ──────────────────────────────────── */
+    const navLinks = document.querySelectorAll('.nav-link');
+    const sections = document.querySelectorAll('section[id]');
+    const navObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.toggle('active',
+                        link.getAttribute('href') === '#' + entry.target.id);
+                });
+            }
+        });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => navObserver.observe(s));
+
+    /* ── Scroll to top button ──────────────────────────────────────── */
+    const scrollBtn = document.getElementById('scroll-top');
+    window.addEventListener('scroll', () => {
+        scrollBtn.classList.toggle('visible', window.scrollY > 400);
+    }, { passive: true });
+    scrollBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    /* ── Carousels ─────────────────────────────────────────────────── */
+    document.querySelectorAll('[data-carousel]').forEach(carousel => {
+        const slides = carousel.querySelectorAll('.carousel-slide');
+        const caption = carousel.querySelector('.carousel-caption');
+        const labelEl = caption.querySelector('.label-text');
+        const counterEl = caption.querySelector('.counter');
+        const thumbsContainer = carousel.querySelector('.carousel-thumbs');
+        const prevBtn = carousel.querySelector('[data-prev]');
+        const nextBtn = carousel.querySelector('[data-next]');
+        let current = 0;
+        let initialized = false;
+
+        if (slides.length <= 1) {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+        }
+
+        slides.forEach((slide, i) => {
+            const thumb = document.createElement('div');
+            thumb.className = 'carousel-thumb' + (i === 0 ? ' active' : '');
+            thumb.addEventListener('click', () => goTo(i));
+
+            const vid = slide.querySelector('video');
+            if (vid) {
+                const canvas = document.createElement('canvas');
+                canvas.style.width = '100%';
+                canvas.style.display = 'block';
+                thumb.appendChild(canvas);
+
+                const tmpVid = document.createElement('video');
+                tmpVid.src = vid.querySelector('source').src;
+                tmpVid.muted = true;
+                tmpVid.preload = 'auto';
+                tmpVid.addEventListener('loadeddata', () => { tmpVid.currentTime = 0.01; });
+                tmpVid.addEventListener('seeked', () => {
+                    canvas.width = tmpVid.videoWidth;
+                    canvas.height = tmpVid.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(tmpVid, 0, 0, canvas.width, canvas.height);
+                    tmpVid.src = '';
+                    tmpVid.load();
+                });
+            }
+
+            const label = document.createElement('div');
+            label.className = 'thumb-label';
+            label.textContent = slide.dataset.label || ('Slide ' + (i + 1));
+            thumb.appendChild(label);
+
+            thumbsContainer.appendChild(thumb);
+        });
+
+        function goTo(idx) {
+            const curVid = slides[current].querySelector('video');
+            if (curVid) curVid.pause();
+
+            slides[current].classList.remove('active');
+            thumbsContainer.children[current].classList.remove('active');
+
+            current = (idx + slides.length) % slides.length;
+
+            slides[current].classList.add('active');
+            thumbsContainer.children[current].classList.add('active');
+
+            const slide = slides[current];
+            const detailHtml = slide.dataset.detail
+                ? '<div class="detail">' + slide.dataset.detail + '</div>' : '';
+            labelEl.innerHTML = (slide.dataset.label || '') + detailHtml;
+            counterEl.textContent = (current + 1) + ' / ' + slides.length;
+
+            const newVid = slides[current].querySelector('video');
+            if (newVid) {
+                newVid.currentTime = 0;
+                newVid.play().catch(() => {});
+            }
+
+            if (initialized) {
+                thumbsContainer.children[current].scrollIntoView({
+                    behavior: 'smooth', block: 'nearest', inline: 'center'
+                });
+            }
+        }
+
+        prevBtn.addEventListener('click', () => goTo(current - 1));
+        nextBtn.addEventListener('click', () => goTo(current + 1));
+
+        carousel.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') { goTo(current - 1); e.preventDefault(); }
+            if (e.key === 'ArrowRight') { goTo(current + 1); e.preventDefault(); }
+        });
+
+        goTo(0);
+        initialized = true;
+    });
+
+    // Auto-play/pause on scroll.
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            const activeSlide = entry.target.querySelector('.carousel-slide.active');
+            if (!activeSlide) return;
+            const vid = activeSlide.querySelector('video');
+            if (!vid) return;
+            if (entry.isIntersecting) vid.play().catch(() => {});
+            else vid.pause();
+        });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('[data-carousel]').forEach(c => observer.observe(c));
+
+    /* ── Ava-256 browser ───────────────────────────────────────────── */
+    const avaBrowser = document.getElementById('ava-browser');
+    if (avaBrowser) {
+        const video = document.getElementById('ava-video');
+        const methodBtns = avaBrowser.querySelectorAll('.ava-method-btn');
+        const subjectEls = avaBrowser.querySelectorAll('.ava-subject');
+        let curMethod = 'headsup_16enc';
+        let curSubject = 'PGO261';
+
+        function avaUpdate() {
+            const src = 'videos/ava256_subjects/' + curMethod + '/' + curSubject + '.mp4';
+            video.querySelector('source').src = src;
+            video.load();
+            video.play().catch(() => {});
+        }
+
+        methodBtns.forEach(btn => btn.addEventListener('click', () => {
+            methodBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            curMethod = btn.dataset.method;
+            avaUpdate();
+        }));
+
+        subjectEls.forEach(el => el.addEventListener('click', () => {
+            subjectEls.forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+            curSubject = el.dataset.subject;
+            avaUpdate();
+        }));
+
+        subjectEls.forEach(el => {
+            const sid = el.dataset.subject;
+            const canvas = el.querySelector('canvas');
+            canvas.style.width = '100%';
+            canvas.style.display = 'block';
+            const tmpVid = document.createElement('video');
+            tmpVid.src = 'videos/ava256_subjects/headsup_16enc/' + sid + '.mp4';
+            tmpVid.muted = true;
+            tmpVid.preload = 'auto';
+            tmpVid.addEventListener('loadeddata', () => { tmpVid.currentTime = 0.01; });
+            tmpVid.addEventListener('seeked', () => {
+                canvas.width = tmpVid.videoWidth;
+                canvas.height = tmpVid.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(tmpVid, 0, 0, canvas.width, canvas.height);
+                tmpVid.src = '';
+                tmpVid.load();
+            });
+        });
+
+        const avaObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) video.play().catch(() => {});
+                else video.pause();
+            });
+        }, { threshold: 0.3 });
+        avaObserver.observe(avaBrowser);
+    }
+
+    /* ── Internal dataset browser ──────────────────────────────────── */
+    const internal10kBrowser = document.getElementById('internal10k-browser');
+    if (internal10kBrowser) {
+        const video = document.getElementById('internal10k-video');
+        const methodBtns = internal10kBrowser.querySelectorAll('.ava-method-btn');
+        const subjectEls = internal10kBrowser.querySelectorAll('.ava-subject');
+        let curMethod = 'headsup_10enc_closeup';
+        let curSubject = '757689';
+
+        function internal10kUpdate() {
+            const src = 'videos/internal_dataset_results/' + curMethod + '/' + curSubject + '.mp4';
+            video.querySelector('source').src = src;
+            video.load();
+            video.play().catch(() => {});
+        }
+
+        methodBtns.forEach(btn => btn.addEventListener('click', () => {
+            methodBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            curMethod = btn.dataset.method;
+            internal10kUpdate();
+        }));
+
+        subjectEls.forEach(el => el.addEventListener('click', () => {
+            subjectEls.forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+            curSubject = el.dataset.subject;
+            internal10kUpdate();
+        }));
+
+        subjectEls.forEach(el => {
+            const sid = el.dataset.subject;
+            const canvas = el.querySelector('canvas');
+            canvas.style.width = '100%';
+            canvas.style.display = 'block';
+            const tmpVid = document.createElement('video');
+            tmpVid.src = 'videos/internal_dataset_results/headsup_10enc_closeup/' + sid + '.mp4';
+            tmpVid.muted = true;
+            tmpVid.preload = 'auto';
+            tmpVid.addEventListener('loadeddata', () => { tmpVid.currentTime = 0.01; });
+            tmpVid.addEventListener('seeked', () => {
+                canvas.width = tmpVid.videoWidth;
+                canvas.height = tmpVid.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(tmpVid, 0, 0, canvas.width, canvas.height);
+                tmpVid.src = '';
+                tmpVid.load();
+            });
+        });
+
+        const internal10kObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) video.play().catch(() => {});
+                else video.pause();
+            });
+        }, { threshold: 0.3 });
+        internal10kObserver.observe(internal10kBrowser);
+    }
+
+    /* ── Expression Driving browser ────────────────────────────────── */
+    const drivingBrowser = document.getElementById('driving-browser');
+    if (drivingBrowser) {
+        const video = document.getElementById('driving-video');
+        const subjectEls = drivingBrowser.querySelectorAll('.ava-subject');
+        let curSubject = '519611';
+
+        function drivingUpdate() {
+            const src = 'videos/blendshape_driven_collage_videos/collage_driving_' + curSubject + '_row.mp4';
+            video.querySelector('source').src = src;
+            video.load();
+            video.play().catch(() => {});
+        }
+
+        subjectEls.forEach(el => el.addEventListener('click', () => {
+            subjectEls.forEach(s => s.classList.remove('active'));
+            el.classList.add('active');
+            curSubject = el.dataset.subject;
+            drivingUpdate();
+        }));
+
+        // Generate subject thumbnails from first frames.
+        subjectEls.forEach(el => {
+            const sid = el.dataset.subject;
+            const canvas = el.querySelector('canvas');
+            canvas.style.width = '100%';
+            canvas.style.display = 'block';
+            const tmpVid = document.createElement('video');
+            tmpVid.src = 'videos/blendshape_driven_collage_videos/collage_driving_' + sid + '_row.mp4';
+            tmpVid.muted = true;
+            tmpVid.preload = 'auto';
+            tmpVid.addEventListener('loadeddata', () => { tmpVid.currentTime = 0.01; });
+            tmpVid.addEventListener('seeked', () => {
+                canvas.width = tmpVid.videoWidth;
+                canvas.height = tmpVid.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(tmpVid, 0, 0, canvas.width, canvas.height);
+                tmpVid.src = '';
+                tmpVid.load();
+            });
+        });
+
+        const drivingObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) video.play().catch(() => {});
+                else video.pause();
+            });
+        }, { threshold: 0.3 });
+        drivingObserver.observe(drivingBrowser);
+    }
+
+    /* ── Generation Results: auto-play on scroll ───────────────────── */
+    const genContainer = document.querySelector('.generation-video-container');
+    if (genContainer) {
+        const genVideo = genContainer.querySelector('video');
+        const genObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) genVideo.play().catch(() => {});
+                else genVideo.pause();
+            });
+        }, { threshold: 0.3 });
+        genObserver.observe(genContainer);
+    }
+
+    /* ── Rigging: shared subject selector ──────────────────────────── */
+    const riggingSection = document.getElementById('rigging');
+    if (riggingSection) {
+        const subjects = riggingSection.querySelectorAll('.rigging-subject');
+        const slots = riggingSection.querySelectorAll('.rigging-video-slot');
+        const gtVideos = riggingSection.querySelectorAll('.rigging-gt-video:not(.rigging-gt-placeholder)');
+
+        subjects.forEach(subjectEl => {
+            const sid = subjectEl.dataset.subject;
+            const canvas = subjectEl.querySelector('canvas');
+            canvas.style.width = '100%';
+            canvas.style.display = 'block';
+            const neutralVid = riggingSection.querySelector('[data-expression="neutral"] video[data-subject="' + sid + '"]');
+            if (neutralVid) {
+                const tmpVid = document.createElement('video');
+                tmpVid.src = neutralVid.querySelector('source').src;
+                tmpVid.muted = true;
+                tmpVid.preload = 'auto';
+                tmpVid.addEventListener('loadeddata', () => { tmpVid.currentTime = 0.01; });
+                tmpVid.addEventListener('seeked', () => {
+                    canvas.width = tmpVid.videoWidth;
+                    canvas.height = tmpVid.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(tmpVid, 0, 0, canvas.width, canvas.height);
+                    const placeholder = riggingSection.querySelector('.rigging-gt-placeholder');
+                    if (placeholder && !placeholder.style.aspectRatio) {
+                        placeholder.style.aspectRatio = tmpVid.videoWidth + ' / ' + tmpVid.videoHeight;
+                    }
+                    tmpVid.src = '';
+                    tmpVid.load();
+                });
+            }
+        });
+
+        function selectSubject(sid) {
+            subjects.forEach(s => s.classList.toggle('active', s.dataset.subject === sid));
+            slots.forEach(slot => {
+                slot.querySelectorAll('.rigging-ours-video').forEach(vid => {
+                    if (vid.dataset.subject === sid) {
+                        vid.classList.add('active');
+                        vid.currentTime = 0;
+                        vid.play().catch(() => {});
+                    } else {
+                        vid.classList.remove('active');
+                        vid.pause();
+                    }
+                });
+            });
+            gtVideos.forEach(v => { v.currentTime = 0; v.play().catch(() => {}); });
+        }
+
+        subjects.forEach(s => s.addEventListener('click', () => selectSubject(s.dataset.subject)));
+
+        const riggingObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const allVids = entry.target.querySelectorAll('.rigging-ours-video.active, .rigging-gt-video:not(.rigging-gt-placeholder)');
+                allVids.forEach(v => {
+                    if (entry.isIntersecting) v.play().catch(() => {});
+                    else v.pause();
+                });
+            });
+        }, { threshold: 0.3 });
+        riggingObserver.observe(riggingSection.querySelector('.rigging-layout'));
+    }
+
+    /* ── Copy BibTeX button ───────────────────────────────────────────── */
+    const copyBtn = document.getElementById('copy-bibtex');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', () => {
+            const code = document.getElementById('bibtex-code').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                copyBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Copied!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+                }, 2000);
+            });
+        });
+    }
+});
+</script>
+
+</body>
+</html>
