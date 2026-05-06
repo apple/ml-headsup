@@ -1,6 +1,6 @@
 # Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures
 
-This repository accompanies the research paper **[Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures](https://arxiv.org/abs/XYZ)** by *Evangelos Ntavelis, Sean Wu, Mohamad Shahbazi, Fabio Maninchedda, Dmitry Kostiaev, Artem Sevastopolsky, Vittorio Megaro, Trevor Phillips, Alejandro Blumentals, Shridhar Ravikumar, Mehak Gupta, Reinhard Knothe, Jeronimo Bayer, Matthias Vestner, Simon Schaefer, Thomas Etterlin, Christian Zimmermann, Mathias Deschler, Peter Kaufmann, Stefan Brugger, Sebastian Martin, Brian Amberg and Tom Runia* on the 3D reconstruction of faces from multi-view captures.
+This repository accompanies the research paper **[Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures](https://arxiv.org/abs/2605.04035)** by *Evangelos Ntavelis, Sean Wu, Mohamad Shahbazi, Fabio Maninchedda, Dmitry Kostiaev, Artem Sevastopolsky, Vittorio Megaro, Trevor Phillips, Alejandro Blumentals, Shridhar Ravikumar, Mehak Gupta, Reinhard Knothe, Jeronimo Bayer, Matthias Vestner, Simon Schaefer, Thomas Etterlin, Christian Zimmermann, Mathias Deschler, Peter Kaufmann, Stefan Brugger, Sebastian Martin, Brian Amberg and Tom Runia* on the 3D reconstruction of faces from multi-view captures.
 
 ## Abstract
 
@@ -20,10 +20,10 @@ The repository provides examples of the results for our models trained on the In
 ## Citations
 
 ```
-@article{ToDo,
+@article{ntavelis2026headsup,
   title={Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures},
-  author={ToDo},
-  journal={arXiv preprint arXiv:TODO},
+  author={Ntavelis, Evan and Wu, Sean and Shahbazi, Mohamad and Maninchedda, Fabio and Kostiaev, Dmitry and Sevastopolsky, Artem and Megaro, Vittorio and Phillips, Trevor and Blumentals, Alejandro and Ravikumar, Shridhar and Gupta, Mehak and Knothe, Reinhard and Bayer, Jeronimo and Vestner, Matthias and Schaefer, Simon and Etterlin, Thomas and Zimmermann, Christian and Deschler, Mathias and Kaufmann, Peter and Brugger, Stefan and Martin, Sebastian and Amberg, Brian and Runia, Tom},
+  journal={arXiv preprint arXiv:2605.04035},
   year={2026}
 }
 ```
