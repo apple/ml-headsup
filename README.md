@@ -1,6 +1,6 @@
 # Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures
 
-This repository accompanies the research paper **[Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures](https://arxiv.org/abs/2605.04035)** (ECCV, 2026) by *Evangelos Ntavelis, Sean Wu, Mohamad Shahbazi, Fabio Maninchedda, Dmitry Kostiaev, Artem Sevastopolsky, Vittorio Megaro, Trevor Phillips, Alejandro Blumentals, Shridhar Ravikumar, Mehak Gupta, Reinhard Knothe, Jeronimo Bayer, Matthias Vestner, Simon Schaefer, Thomas Etterlin, Christian Zimmermann, Mathias Deschler, Alexey Artemov, Peter Kaufmann, Stefan Brugger, Sebastian Martin, Brian Amberg and Tom Runia* on the 3D reconstruction of faces from multi-view captures.
+This repository accompanies the research paper **[Large-Scale High-Quality 3D Gaussian Head Reconstruction from Multi-View Captures](https://arxiv.org/abs/2605.04035)** (ECCV, 2026) by *Evangelos Ntavelis, Sean Wu, Mohamad Shahbazi, Fabio Maninchedda, Dmitry Kostiaev, Artem Sevastopolsky, Vittorio Megaro, Trevor Phillips, Alejandro Blumentals, Shridhar Ravikumar, Mehak Gupta, Reinhard Knothe, Jeronimo Bayer, Matthias Vestner, Simon Schaefer, Thomas Etterlin, Christian Zimmermann, Alexey Artemov, Mathias Deschler, Peter Kaufmann, Stefan Brugger, Sebastian Martin, Brian Amberg and Tom Runia* on the 3D reconstruction of faces from multi-view captures.
 
 ## Abstract
 
